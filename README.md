@@ -1,5 +1,5 @@
 # TinyTui
-- Single-file ANSI/VT100 helper (`TinyTui.cs`) for quickly hacking together text UIs in .NET.
+- Single-file ANSI/VT100 helper (`TinyTui.cs`) for quickly hacking together TUIs in .NET.
 - Provides cursor movement, clearing, scroll regions, color/style helpers, and a portable terminal-size probe (with a Windows console mode shim).
 - Ships with `Program.cs`, a guided demo that exercises every API so you can see the escape sequences in action.
 - Built collaboratively by Alfred and GitHub Copilot (yes, the AI helped assemble this tiny toolkit).
