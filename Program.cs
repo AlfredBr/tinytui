@@ -99,7 +99,6 @@ try
         TinyTui.WriteAt(row - 1, 40, $"{step * 10,3}%");
         Thread.Sleep(300);
     }
-
     TinyTui.RestoreCursor();
     Console.Write(" cursor restored.");
 
