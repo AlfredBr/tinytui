@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace AlfredBr;
 
@@ -29,6 +29,7 @@ public static class TinyTui
         }
     }
 
+    #region Clear Screen/Line
     /// <summary>
     /// Clears the entire screen and optionally homes the cursor.
     /// </summary>
@@ -48,7 +49,9 @@ public static class TinyTui
     {
         Write($"{Csi}{(int)mode}K", writer);
     }
+    #endregion
 
+    #region Cursor Movement
     /// <summary>
     /// Moves the cursor to an absolute position (1-based row and column).
     /// </summary>
@@ -58,9 +61,35 @@ public static class TinyTui
     }
 
     public static void MoveUp(int rows = 1, TextWriter? writer = null) => Move("A", rows, writer);
+
     public static void MoveDown(int rows = 1, TextWriter? writer = null) => Move("B", rows, writer);
-    public static void MoveRight(int columns = 1, TextWriter? writer = null) => Move("C", columns, writer);
-    public static void MoveLeft(int columns = 1, TextWriter? writer = null) => Move("D", columns, writer);
+
+    public static void MoveRight(int columns = 1, TextWriter? writer = null) =>
+        Move("C", columns, writer);
+
+    public static void MoveLeft(int columns = 1, TextWriter? writer = null) =>
+        Move("D", columns, writer);
+
+    /// <summary>
+    /// Moves the cursor in the given direction by the given amount.
+    /// </summary>
+    /// <param name="code"></param>
+    /// <param name="amount"></param>
+    /// <param name="writer"></param>
+    private static void Move(string code, int amount, TextWriter? writer)
+    {
+        if (amount <= 0)
+        {
+            return;
+        }
+
+        Write($"{Csi}{amount}{code}", writer);
+    }
+
+    private static void Write(string data, TextWriter? writer)
+    {
+        (writer ?? Console.Out).Write(data);
+    }
 
     /// <summary>
     /// Writes text at the given row/column without altering other content.
@@ -70,7 +99,9 @@ public static class TinyTui
         Goto(row, column, writer);
         Write(text, writer);
     }
+    #endregion
 
+    #region Cursor Save/Restore
     /// <summary>
     /// Saves and restores the cursor position (works on modern terminals).
     /// </summary>
@@ -81,7 +112,9 @@ public static class TinyTui
     public static void HideCursor(TextWriter? writer = null) => Write(Csi + "?25l", writer);
 
     public static void ShowCursor(TextWriter? writer = null) => Write(Csi + "?25h", writer);
+    #endregion
 
+    #region Scroll Region
     /// <summary>
     /// Sets the scrolling region so that scrolls stay within a sub-rectangle.
     /// </summary>
@@ -94,7 +127,9 @@ public static class TinyTui
     /// Resets the scrolling region to the full screen.
     /// </summary>
     public static void ResetScrollRegion(TextWriter? writer = null) => Write(Csi + "r", writer);
+    #endregion
 
+    #region Styles and Colors
     /// <summary>
     /// Applies zero or more Select Graphic Rendition (SGR) attributes; pass none to reset.
     /// </summary>
@@ -106,7 +141,8 @@ public static class TinyTui
             return;
         }
 
-        Span<int> codes = styles.Length <= 8 ? stackalloc int[styles.Length] : new int[styles.Length];
+        Span<int> codes =
+            styles.Length <= 8 ? stackalloc int[styles.Length] : new int[styles.Length];
         for (int i = 0; i < styles.Length; i++)
         {
             codes[i] = (int)styles[i];
@@ -119,7 +155,13 @@ public static class TinyTui
     /// Applies a foreground and/or background color. Pass null to leave either unchanged.
     /// Includes the bright color variants when requested.
     /// </summary>
-    public static void SetColors(TextWriter? writer = null, AnsiColor? foreground = null, bool brightForeground = false, AnsiColor? background = null, bool brightBackground = false)
+    public static void SetColors(
+        TextWriter? writer = null,
+        AnsiColor? foreground = null,
+        bool brightForeground = false,
+        AnsiColor? background = null,
+        bool brightBackground = false
+    )
     {
         Span<int> parts = stackalloc int[4];
         int count = 0;
@@ -147,7 +189,9 @@ public static class TinyTui
     /// Resets all SGR attributes (colors, bold, underline, etc.).
     /// </summary>
     public static void ResetStyle(TextWriter? writer = null) => Write(Csi + "0m", writer);
+    #endregion
 
+    #region Terminal Size
     /// <summary>
     /// Returns the current logical window size reported by Console.
     /// </summary>
@@ -198,6 +242,13 @@ public static class TinyTui
         return GetWindowSize();
     }
 
+    /// <summary>
+    /// Parses a cursor position response of the form ESC[row;columnR.
+    /// </summary>
+    /// <param name="response"></param>
+    /// <param name="rows"></param>
+    /// <param name="columns"></param>
+    /// <returns></returns>
     private static bool TryParseCursorResponse(string response, out int rows, out int columns)
     {
         rows = 0;
@@ -220,23 +271,13 @@ public static class TinyTui
         return int.TryParse(parts[0], out rows) && int.TryParse(parts[1], out columns);
     }
 
-    private static void Move(string code, int amount, TextWriter? writer)
-    {
-        if (amount <= 0)
-        {
-            return;
-        }
-
-        Write($"{Csi}{amount}{code}", writer);
-    }
-
-    private static void Write(string data, TextWriter? writer)
-    {
-        (writer ?? Console.Out).Write(data);
-    }
-
+    /// <summary>
+    /// Represents terminal dimensions in columns and rows.
+    /// </summary>
     public readonly record struct TerminalSize(int Columns, int Rows);
+    #endregion
 
+    #region Enums
     public enum AnsiColor
     {
         Black = 0,
@@ -268,7 +309,9 @@ public static class TinyTui
         ToStart = 1,
         Full = 2
     }
+    #endregion
 
+    #region Windows Input Mode Scope
     // Windows-specific helper to temporarily disable echo/line input and
     // enable VT input so DSR replies don't get echoed to the screen.
     private sealed class WindowsInputModeScope : IDisposable
@@ -325,7 +368,13 @@ public static class TinyTui
         {
             if (_changed && _hIn != nint.Zero)
             {
-                try { SetConsoleMode(_hIn, _prevMode); } catch { /* ignore */ }
+                try
+                {
+                    SetConsoleMode(_hIn, _prevMode);
+                }
+                catch
+                { /* ignore */
+                }
             }
         }
 
@@ -343,4 +392,164 @@ public static class TinyTui
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetConsoleMode(nint hConsoleHandle, uint dwMode);
     }
+    #endregion
+
+    #region Spinner
+    private static readonly string[] Symbols =
+    {
+        "⣾⣿",
+        "⣽⣿",
+        "⣻⣿",
+        "⢿⣿",
+        "⡿⣿",
+        "⣟⣿",
+        "⣯⣿",
+        "⣷⣿",
+        "⣿⣾",
+        "⣿⣽",
+        "⣿⣻",
+        "⣿⢿",
+        "⣿⡿",
+        "⣿⣟",
+        "⣿⣯",
+        "⣿⣷"
+    };
+
+    /// <summary>
+    /// Runs a synchronous action while showing an animated spinner.
+    /// </summary>
+    public static void Spinner(Action action, string label, TextWriter? writer = null)
+    {
+        if (action is null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        Spinner(
+                () =>
+                {
+                    action();
+                    return Task.CompletedTask;
+                },
+                label,
+                writer
+            )
+            .GetAwaiter()
+            .GetResult();
+    }
+
+    /// <summary>
+    /// Runs an asynchronous operation while showing an animated spinner.
+    /// </summary>
+    public static Task Spinner(
+        Func<Task> task,
+        string label,
+        TextWriter? writer = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (task is null)
+        {
+            throw new ArgumentNullException(nameof(task));
+        }
+
+        return RunSpinnerAsync(task, label, writer, cancellationToken);
+    }
+
+    private static async Task RunSpinnerAsync(
+        Func<Task> operation,
+        string label,
+        TextWriter? writer,
+        CancellationToken cancellationToken
+    )
+    {
+        if (label is null)
+        {
+            throw new ArgumentNullException(nameof(label));
+        }
+
+        var output = writer ?? Console.Out;
+        bool canColor = ReferenceEquals(output, Console.Out);
+        var originalColor = canColor ? Console.ForegroundColor : ConsoleColor.Gray;
+
+        int lastFrameLength = 0;
+        using var spinnerCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var spinnerToken = spinnerCts.Token;
+
+        var spinnerTask = Task.Run(
+            async () =>
+            {
+                int index = 0;
+                while (!spinnerToken.IsCancellationRequested)
+                {
+                    lastFrameLength = WriteFrame(output, label, Symbols[index], canColor);
+                    index = (index + 1) % Symbols.Length;
+
+                    try
+                    {
+                        await Task.Delay(100, spinnerToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                }
+            },
+            spinnerToken
+        );
+
+        try
+        {
+            await operation();
+        }
+        finally
+        {
+            spinnerCts.Cancel();
+            try
+            {
+                await spinnerTask;
+            }
+            catch (OperationCanceledException)
+            {
+                // expected when the spinner stops
+            }
+            finally
+            {
+                ClearFrame(output, lastFrameLength);
+                if (canColor)
+                {
+                    Console.ForegroundColor = originalColor;
+                }
+            }
+        }
+    }
+
+    private static int WriteFrame(TextWriter output, string label, string symbol, bool useColor)
+    {
+        if (useColor)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+        }
+
+        output.Write("\r");
+        output.Write(symbol);
+        output.Write(' ');
+        output.Write(label);
+        output.Flush();
+
+        return symbol.Length + 1 + label.Length;
+    }
+
+    private static void ClearFrame(TextWriter output, int length)
+    {
+        output.Write("\r");
+        if (length > 0)
+        {
+            output.Write(new string(' ', length));
+            output.Write("\r");
+        }
+
+        output.Flush();
+    }
+    #endregion
 }

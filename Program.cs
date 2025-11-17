@@ -121,6 +121,11 @@ try
     Console.Write("↑");
 
     row += 4;
+    TinyTui.Goto(row, 1);
+    TinyTui.Spinner(() => Thread.Sleep(5000), "Spinner demo");
+    TinyTui.WriteAt(row + 1, 1, "Spinner demo complete.");
+    row += 3;
+
     if (windowSize.Rows - row > 6)
     {
         int logTop = windowSize.Rows - 4;
