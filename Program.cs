@@ -20,10 +20,11 @@ public static class Program
             borderColor: TinyTui.AnsiColor.Cyan,
             brightBorder: false,
             textColor: TinyTui.AnsiColor.Yellow,
-            brightText: true);
+            brightText: true
+        );
 
         TinyTui.Goto(15, 1);
-        
+
         var result = TinyTui.ShowMenu2(
             "Choose an option from the menu below:",
             new List<MenuItem>
@@ -32,11 +33,14 @@ public static class Program
                 new MenuItem("Do something exciting", 2),
                 new MenuItem("Exit the program", 0)
             },
-            multiSelect: false, 
+            multiSelect: false,
             promptColor: ConsoleColor.DarkYellow,
             highlightColor: ConsoleColor.Cyan,
-            selectionColor: ConsoleColor.Yellow);
-        Console.WriteLine($"You selected: '{result.PrimaryItem?.Name}' with value: '{result.PrimaryItem?.Value}'");
+            selectionColor: ConsoleColor.Yellow
+        );
+        Console.WriteLine(
+            $"You selected: '{result.PrimaryItem?.Name}' with value: '{result.PrimaryItem?.Value}'"
+        );
 
         TinyTui.Cleanup();
     }
