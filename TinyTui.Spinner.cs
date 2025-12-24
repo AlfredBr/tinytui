@@ -1,3 +1,5 @@
+namespace AlfredBr;
+
 public static partial class TinyTui
 {
     private static readonly string[] Symbols =
@@ -30,17 +32,25 @@ public static partial class TinyTui
             throw new ArgumentNullException(nameof(action));
         }
 
-        Spinner(
-                () =>
-                {
-                    action();
-                    return Task.CompletedTask;
-                },
-                label,
-                writer
-            )
-            .GetAwaiter()
-            .GetResult();
+        try
+        {
+            TinyTui.HideCursor();
+            Spinner(
+                    () =>
+                    {
+                        action();
+                        return Task.CompletedTask;
+                    },
+                    label,
+                    writer
+                )
+                .GetAwaiter()
+                .GetResult();
+        }
+        finally
+        {
+            TinyTui.ShowCursor();
+        }
     }
 
     /// <summary>
@@ -109,7 +119,7 @@ public static partial class TinyTui
         }
         finally
         {
-            spinnerCts.Cancel();
+            await spinnerCts.CancelAsync();
             try
             {
                 await spinnerTask;

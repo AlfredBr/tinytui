@@ -1,5 +1,7 @@
 namespace AlfredBr;
 
+#pragma warning disable S107, S6608
+
 public static partial class TinyTui
 {
     /// <summary>
@@ -44,17 +46,7 @@ public static partial class TinyTui
         int innerHeight = height - 2;
         var lines = PrepareContentLines(content, innerWidth, innerHeight);
 
-        RenderTopBorder(
-            output,
-            x,
-            y,
-            innerWidth,
-            title,
-            borderColor,
-            brightBorder,
-            textColor,
-            brightText
-        );
+        RenderTopBorder(output, x, y, innerWidth, title, borderColor, brightBorder, textColor, brightText);
 
         for (int row = 0; row < innerHeight; row++)
         {
@@ -77,11 +69,57 @@ public static partial class TinyTui
         RenderBottomBorder(output, x, y + height - 1, innerWidth, borderColor, brightBorder);
     }
 
-    private static List<string> PrepareContentLines(
-        IEnumerable<string>? content,
-        int innerWidth,
-        int innerHeight
+    public static void ShowBox(
+        string[] contents,
+        ConsoleColor lineColor = ConsoleColor.DarkYellow,
+        ConsoleColor textColor = ConsoleColor.White
     )
+    {
+        if (contents == null || contents.Length == 0)
+        {
+            return;
+        }
+
+        contents = contents.Where(t => t?.Length > 0).ToArray();
+        var lengths = contents.Select(t => t.Length).ToArray();
+
+        Console.SetCursorPosition(0, Console.CursorTop);
+        Console.ForegroundColor = lineColor;
+        Console.Write("┌");
+        for (var l = 0; l < lengths.Length - 1; l++)
+        {
+            var length = lengths[l];
+            Console.Write("─".PadRight(length + 2, '─'));
+            Console.Write("┬");
+        }
+        Console.Write("─".PadRight(lengths.Last() + 2, '─'));
+        Console.WriteLine("┐");
+
+        foreach (var content in contents)
+        {
+            Console.ForegroundColor = lineColor;
+            Console.Write("│ ");
+            Console.ForegroundColor = textColor;
+            Console.Write(content);
+            Console.ForegroundColor = lineColor;
+            Console.Write(" ");
+        }
+        Console.WriteLine("│");
+
+        Console.ForegroundColor = lineColor;
+        Console.Write("└");
+        for (var l = 0; l < lengths.Length - 1; l++)
+        {
+            var length = lengths[l];
+            Console.Write("─".PadRight(length + 2, '─'));
+            Console.Write("┴");
+        }
+        Console.Write("─".PadRight(lengths.Last() + 2, '─'));
+        Console.WriteLine("┘");
+        Console.ForegroundColor = ConsoleColor.White;
+    }
+
+    private static List<string> PrepareContentLines(IEnumerable<string>? content, int innerWidth, int innerHeight)
     {
         var lines = new List<string>();
         if (content is null || innerHeight <= 0)
@@ -131,8 +169,8 @@ public static partial class TinyTui
         string? title,
         AnsiColor? borderColor,
         bool brightBorder,
-        AnsiColor? textColor,
-        bool brightText
+        AnsiColor? textColor = null,
+        bool brightText = false
     )
     {
         Goto(y, x, output);
@@ -147,12 +185,8 @@ public static partial class TinyTui
         }
 
         int titleLength = decoratedTitle?.Length ?? 0;
-        int leftLength = decoratedTitle is null
-            ? innerWidth
-            : Math.Max(0, (innerWidth - titleLength) / 2);
-        int rightLength = decoratedTitle is null
-            ? 0
-            : Math.Max(0, innerWidth - titleLength - leftLength);
+        int leftLength = decoratedTitle is null ? innerWidth : Math.Max(0, (innerWidth - titleLength) / 2);
+        int rightLength = decoratedTitle is null ? 0 : Math.Max(0, innerWidth - titleLength - leftLength);
 
         WriteWithColor(output, "┌", borderColor, brightBorder);
         if (leftLength > 0)
@@ -221,12 +255,7 @@ public static partial class TinyTui
         WriteWithColor(output, "┘", borderColor, brightBorder);
     }
 
-    private static void WriteWithColor(
-        TextWriter output,
-        string text,
-        AnsiColor? color,
-        bool bright
-    )
+    private static void WriteWithColor(TextWriter output, string text, AnsiColor? color, bool bright)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -243,55 +272,5 @@ public static partial class TinyTui
         {
             output.Write(text);
         }
-    }
-
-    public static void ShowBox(
-        string[] contents,
-        ConsoleColor lineColor = ConsoleColor.DarkYellow,
-        ConsoleColor textColor = ConsoleColor.White
-    )
-    {
-        if (contents == null || contents.Length == 0)
-        {
-            return;
-        }
-
-        contents = contents.Where(t => t?.Length > 0).ToArray();
-        var lengths = contents.Select(t => t.Length).ToArray();
-
-        Console.SetCursorPosition(0, Console.CursorTop);
-        Console.ForegroundColor = lineColor;
-        Console.Write("┌");
-        for (var l = 0; l < lengths.Length - 1; l++)
-        {
-            var length = lengths[l];
-            Console.Write("─".PadRight(length + 2, '─'));
-            Console.Write("┬");
-        }
-        Console.Write("─".PadRight(lengths.Last() + 2, '─'));
-        Console.WriteLine("┐");
-
-        foreach (var content in contents)
-        {
-            Console.ForegroundColor = lineColor;
-            Console.Write("│ ");
-            Console.ForegroundColor = textColor;
-            Console.Write(content);
-            Console.ForegroundColor = lineColor;
-            Console.Write(" ");
-        }
-        Console.WriteLine("│");
-
-        Console.ForegroundColor = lineColor;
-        Console.Write("└");
-        for (var l = 0; l < lengths.Length - 1; l++)
-        {
-            var length = lengths[l];
-            Console.Write("─".PadRight(length + 2, '─'));
-            Console.Write("┴");
-        }
-        Console.Write("─".PadRight(lengths.Last() + 2, '─'));
-        Console.WriteLine("┘");
-        Console.ForegroundColor = ConsoleColor.White;
     }
 }

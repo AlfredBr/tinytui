@@ -9,19 +9,10 @@ public static class Program
 
         var windowSize = TinyTui.GetWindowSize();
 
-        TinyTui.ShowBox(new[] { "This is a TinyTui simple box.", "Just text in a simple box." });
-        TinyTui.ShowBox(
-            x: windowSize.Columns - 39,
-            y: 1,
-            width: 40,
-            height: 4,
-            title: "Box Title",
-            content: new[] { "This is an advanced box.", "With more text and positioning." },
-            borderColor: TinyTui.AnsiColor.Cyan,
-            brightBorder: false,
-            textColor: TinyTui.AnsiColor.Yellow,
-            brightText: true
-        );
+        SimpleBox();
+		AdvancedBox();
+		Spinner();
+
 
         TinyTui.Goto(15, 1);
 
@@ -39,10 +30,44 @@ public static class Program
             highlightColor: ConsoleColor.Cyan,
             selectionColor: ConsoleColor.Yellow
         );
-        Console.WriteLine(
-            $"You selected: '{result.PrimaryItem?.Name}' with value: '{result.PrimaryItem?.Value}'"
-        );
-
+        Console.WriteLine($"You selected: '{result.PrimaryItem?.Name}' with value: '{result.PrimaryItem?.Value}'");
         TinyTui.Cleanup();
     }
+
+    private static void SimpleBox()
+    {
+        TinyTui.HomeCursor();
+        TinyTui.ShowBox(new[] { "This is a TinyTui simple box.", "Just text in a simple box." });
+    }
+
+    private static void AdvancedBox()
+    {
+        TinyTui.HomeCursor();
+        var windowSize = TinyTui.GetWindowSize();
+
+        TinyTui.ShowBox(
+            x: windowSize.Columns - 39,
+            y: 1,
+            width: 40,
+            height: 4,
+            title: "Box Title",
+            content: new[] { "This is an advanced box.", "With more text and positioning." },
+            borderColor: TinyTui.AnsiColor.Cyan,
+            brightBorder: false,
+            textColor: TinyTui.AnsiColor.Yellow,
+            brightText: true
+        );
+    }
+
+	private static void Spinner()
+	{
+		TinyTui.Spinner(
+			() =>
+			{
+				// Simulate some work
+				System.Threading.Thread.Sleep(3000);
+			},
+			"Processing with spinner..."
+		);
+	}
 }
