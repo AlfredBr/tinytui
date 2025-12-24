@@ -27,12 +27,12 @@ public static class Program
 
         var result = TinyTui.ShowMenu2(
             "You are using the TinyTui Menu.  Choose an option below:",
-            new List<MenuItem>
+            new List<TinyTui.MenuItem>
             {
-                new MenuItem("Show a Simple Box", 1),
-                new MenuItem("Show an Advanced Box", 2),
-                new MenuItem("Show a Spinner", 3),
-                new MenuItem("Exit the program", 0)
+                new TinyTui.MenuItem("Show a Simple Box", 1),
+                new TinyTui.MenuItem("Show an Advanced Box", 2),
+                new TinyTui.MenuItem("Show a Spinner", 3),
+                new TinyTui.MenuItem("Exit the program", 0)
             },
             multiSelect: false,
             promptColor: ConsoleColor.DarkYellow,

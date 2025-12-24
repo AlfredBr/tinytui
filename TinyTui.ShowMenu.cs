@@ -4,46 +4,43 @@ using System.Linq;
 
 namespace AlfredBr;
 
-public sealed class MenuItem
-{
-    public MenuItem(string name, object? value = null, bool isSelected = false)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Name must not be empty.", nameof(name));
-        }
-
-        Name = name;
-        Value = value;
-        IsSelected = isSelected;
-    }
-
-    public string Name { get; }
-
-    public object? Value { get; }
-
-    public bool IsSelected { get; set; }
-}
-
-public enum MenuExitReason
-{
-    Confirmed,
-    Escape,
-    Quit
-}
-
-public sealed record MenuSelectionResult(
-    IReadOnlyList<MenuItem> SelectedItems,
-    MenuExitReason Reason
-)
-{
-    public MenuItem? PrimaryItem => SelectedItems.Count > 0 ? SelectedItems[0] : null;
-
-    public IEnumerable<object?> Values => SelectedItems.Select(item => item.Value ?? item.Name);
-}
-
 public static partial class TinyTui
 {
+    public sealed class MenuItem
+    {
+        public MenuItem(string name, object? value = null, bool isSelected = false)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Name must not be empty.", nameof(name));
+            }
+
+            Name = name;
+            Value = value;
+            IsSelected = isSelected;
+        }
+
+        public string Name { get; }
+
+        public object? Value { get; }
+
+        public bool IsSelected { get; set; }
+    }
+
+    public enum MenuExitReason
+    {
+        Confirmed,
+        Escape,
+        Quit
+    }
+
+    public sealed record MenuSelectionResult(IReadOnlyList<MenuItem> SelectedItems, MenuExitReason Reason)
+    {
+        public MenuItem? PrimaryItem => SelectedItems.Count > 0 ? SelectedItems[0] : null;
+
+        public IEnumerable<object?> Values => SelectedItems.Select(item => item.Value ?? item.Name);
+    }
+
     public static MenuSelectionResult ShowMenu2(
         string? prompt,
         IReadOnlyList<MenuItem> menuItems,
@@ -97,9 +94,8 @@ public static partial class TinyTui
             ConsoleColor selectionColor
         )
         {
-            _prompt = string.IsNullOrWhiteSpace(prompt)
-                ? (multiSelect ? "Select one or more options:" : "Select an option:")
-                : prompt.Trim();
+            string defaultPrompt = multiSelect ? "Select one or more options:" : "Select an option:";
+            _prompt = string.IsNullOrWhiteSpace(prompt) ? defaultPrompt : prompt.Trim();
             _items = items;
             _multiSelect = multiSelect;
             _promptColor = promptColor;
@@ -258,9 +254,7 @@ public static partial class TinyTui
             Console.SetCursorPosition(0, instructionsRow);
             Console.ForegroundColor = _originalColor;
             Console.Write(
-                _multiSelect
-                    ? "Enter=Confirm  Space=Toggle  Esc=Cancel  Q=Quit"
-                    : "Enter=Confirm  Esc=Cancel  Q=Quit"
+                _multiSelect ? "Enter=Confirm  Space=Toggle  Esc=Cancel  Q=Quit" : "Enter=Confirm  Esc=Cancel  Q=Quit"
             );
         }
     }

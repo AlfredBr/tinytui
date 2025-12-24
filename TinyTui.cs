@@ -43,27 +43,32 @@ public static partial class TinyTui
     }
     #endregion
 
-    #region Clear Screen/Line
-    /// <summary>
-    /// Clears the entire screen and optionally homes the cursor.
-    /// </summary>
+    #region Clear Screen
     public static void ClearScreen(bool home = true, TextWriter? writer = null)
     {
         Console.Clear();
-
-        // Write(Csi + "2J", writer);
-        // if (home)
-        // {
-        //     Write(Csi + "H", writer);
-        // }
     }
+    #endregion
 
+    #region Clear Line
     /// <summary>
     /// Clears the active line (default: whole line = ESC[2K).
     /// </summary>
     public static void ClearLine(TextWriter? writer = null, LineClearMode mode = LineClearMode.Full)
     {
         Write($"{Csi}{(int)mode}K", writer);
+    }
+    #endregion
+
+    #region Home Cursor
+    /// <summary>
+    /// Moves the cursor to the home position (1,1).
+    /// </summary>
+    /// <param name="writer"></param>
+    /// <returns></returns>
+    public static void HomeCursor(TextWriter? writer = null)
+    {
+        Write($"{Csi}H", writer);
     }
     #endregion
 
@@ -80,11 +85,9 @@ public static partial class TinyTui
 
     public static void MoveDown(int rows = 1, TextWriter? writer = null) => Move("B", rows, writer);
 
-    public static void MoveRight(int columns = 1, TextWriter? writer = null) =>
-        Move("C", columns, writer);
+    public static void MoveRight(int columns = 1, TextWriter? writer = null) => Move("C", columns, writer);
 
-    public static void MoveLeft(int columns = 1, TextWriter? writer = null) =>
-        Move("D", columns, writer);
+    public static void MoveLeft(int columns = 1, TextWriter? writer = null) => Move("D", columns, writer);
 
     /// <summary>
     /// Moves the cursor in the given direction by the given amount.
@@ -157,8 +160,7 @@ public static partial class TinyTui
             return;
         }
 
-        Span<int> codes =
-            styles.Length <= 8 ? stackalloc int[styles.Length] : new int[styles.Length];
+        Span<int> codes = styles.Length <= 8 ? stackalloc int[styles.Length] : new int[styles.Length];
         for (int i = 0; i < styles.Length; i++)
         {
             codes[i] = (int)styles[i];
