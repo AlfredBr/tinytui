@@ -113,7 +113,7 @@ public static class Program
             brightBorder: false,
             textColor: TinyTui.AnsiColor.Yellow,
             brightText: true,
-			titleColor: TinyTui.AnsiColor.Green,
+			titleColor: TinyTui.AnsiColor.White,
 			brightTitle: true
         );
 
