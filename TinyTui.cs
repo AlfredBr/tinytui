@@ -24,6 +24,7 @@ public static partial class TinyTui
         Console.WriteLine();
     }
 
+    #region UTF-8 Setup
     /// <summary>
     /// Ensures the console streams speak UTF-8 so escape sequences pass through untouched.
     /// Call once near startup.
@@ -40,6 +41,7 @@ public static partial class TinyTui
             Console.InputEncoding = Encoding.UTF8;
         }
     }
+    #endregion
 
     #region Clear Screen/Line
     /// <summary>
