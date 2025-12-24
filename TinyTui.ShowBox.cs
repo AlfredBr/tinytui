@@ -18,7 +18,9 @@ public static partial class TinyTui
         AnsiColor? borderColor = null,
         bool brightBorder = false,
         AnsiColor? textColor = null,
-        bool brightText = false
+        bool brightText = false,
+        AnsiColor? titleColor = null,
+        bool? brightTitle = false
     )
     {
         if (x < 1)
@@ -46,7 +48,7 @@ public static partial class TinyTui
         int innerHeight = height - 2;
         var lines = PrepareContentLines(content, innerWidth, innerHeight);
 
-        RenderTopBorder(output, x, y, innerWidth, title, borderColor, brightBorder, textColor, brightText);
+        RenderTopBorder(output, x, y, innerWidth, title, borderColor, brightBorder, titleColor, brightTitle);
 
         for (int row = 0; row < innerHeight; row++)
         {
@@ -169,8 +171,8 @@ public static partial class TinyTui
         string? title,
         AnsiColor? borderColor,
         bool brightBorder,
-        AnsiColor? textColor = null,
-        bool brightText = false
+        AnsiColor? titleColor = null,
+        bool? brightTitle = false
     )
     {
         Goto(y, x, output);
@@ -196,7 +198,7 @@ public static partial class TinyTui
 
         if (decoratedTitle is not null)
         {
-            WriteWithColor(output, decoratedTitle, borderColor, brightBorder);
+            WriteWithColor(output, decoratedTitle, titleColor ?? borderColor, brightTitle ?? brightBorder);
         }
 
         if (rightLength > 0)

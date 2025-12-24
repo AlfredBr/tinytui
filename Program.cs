@@ -29,7 +29,7 @@ public static class Program
 
             TinyTui.Goto(15, 1);
 
-            var result = TinyTui.ShowMenu2(
+            var result = TinyTui.ShowMenu(
                 "You are using the TinyTui Menu.  Choose an option below:",
                 new List<TinyTui.MenuItem>
                 {
@@ -69,8 +69,10 @@ public static class Program
             content: new[] { "This is an advanced box.", "With more text and positioning." },
             borderColor: TinyTui.AnsiColor.Cyan,
             brightBorder: false,
-            textColor: TinyTui.AnsiColor.Yellow,
-            brightText: true
+            textColor: TinyTui.AnsiColor.White,
+            brightText: true,
+            titleColor: TinyTui.AnsiColor.Yellow,
+            brightTitle: false
         );
     }
 

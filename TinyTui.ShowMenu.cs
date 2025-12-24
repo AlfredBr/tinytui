@@ -41,7 +41,7 @@ public static partial class TinyTui
         public IEnumerable<object?> Values => SelectedItems.Select(item => item.Value ?? item.Name);
     }
 
-    public static MenuSelectionResult ShowMenu2(
+    public static MenuSelectionResult ShowMenu(
         string? prompt,
         IReadOnlyList<MenuItem> menuItems,
         bool multiSelect = false,
