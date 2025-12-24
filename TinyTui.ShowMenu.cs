@@ -114,6 +114,8 @@ public static partial class TinyTui
                 Console.WriteLine(_prompt);
                 Console.ForegroundColor = _originalColor;
 
+                EnsureBufferSpace(_items.Count + 2);
+
                 _menuTopRow = Console.CursorTop;
                 RenderMenu();
 
@@ -142,6 +144,36 @@ public static partial class TinyTui
             catch
             {
                 _previousCursorVisibility = null;
+            }
+        }
+
+        private static void EnsureBufferSpace(int additionalRowsNeeded)
+        {
+            if (additionalRowsNeeded <= 0)
+            {
+                return;
+            }
+
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            try
+            {
+                int desiredBottom = Console.CursorTop + additionalRowsNeeded;
+                if (desiredBottom >= Console.BufferHeight)
+                {
+                    int newHeight = desiredBottom + 1;
+                    if (newHeight > Console.BufferHeight)
+                    {
+                        Console.SetBufferSize(Console.BufferWidth, newHeight);
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore if the host does not allow resizing the buffer.
             }
         }
 

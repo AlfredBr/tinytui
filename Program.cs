@@ -25,6 +25,9 @@ public static class Program
                 case 3:
                     Spinner();
                     break;
+                case 4:
+                    InputBox();
+                    break;
             }
 
             TinyTui.Goto(15, 1);
@@ -36,6 +39,7 @@ public static class Program
                     new TinyTui.MenuItem("Show a Simple Box", 1),
                     new TinyTui.MenuItem("Show an Advanced Box", 2),
                     new TinyTui.MenuItem("Show a Spinner", 3),
+                    new TinyTui.MenuItem("Show a InputBox", 4),
                     new TinyTui.MenuItem("Exit the program", 0)
                 },
                 multiSelect: false,
@@ -86,5 +90,36 @@ public static class Program
             },
             "Processing with spinner..."
         );
+    }
+
+    private static void InputBox()
+    {
+        TinyTui.HomeCursor();
+        var windowSize = TinyTui.GetWindowSize();
+
+        int x = 2;
+        int y = 2;
+        int width = Math.Clamp(60, 10, Math.Max(10, windowSize.Columns - 4));
+        int height = 3;
+
+        var result = TinyTui.InputBox(
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            title: "Input Box",
+            defaultText: "Type here",
+            borderColor: TinyTui.AnsiColor.Green,
+            brightBorder: false,
+            textColor: TinyTui.AnsiColor.Yellow,
+            brightText: true,
+			titleColor: TinyTui.AnsiColor.Green,
+			brightTitle: true
+        );
+
+        TinyTui.Goto(y + height + 1, 1);
+        Console.WriteLine(result is null ? "Input cancelled." : $"You typed: {result}");
+        Console.WriteLine("Press any key to return to menu...");
+        Console.ReadKey(intercept: true);
     }
 }
