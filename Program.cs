@@ -26,11 +26,12 @@ public static class Program
         TinyTui.Goto(15, 1);
 
         var result = TinyTui.ShowMenu2(
-            "Choose an option from the menu below:",
+            "You are using the TinyTui Menu.  Choose an option below:",
             new List<MenuItem>
             {
-                new MenuItem("Do something interesting", 1),
-                new MenuItem("Do something exciting", 2),
+                new MenuItem("Show a Simple Box", 1),
+                new MenuItem("Show an Advanced Box", 2),
+                new MenuItem("Show a Spinner", 3),
                 new MenuItem("Exit the program", 0)
             },
             multiSelect: false,
