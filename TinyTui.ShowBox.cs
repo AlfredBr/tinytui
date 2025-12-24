@@ -1,6 +1,6 @@
 namespace AlfredBr;
 
-#pragma warning disable S107, S6608
+#pragma warning disable S107, S6608, S3776
 
 public static partial class TinyTui
 {
@@ -71,6 +71,12 @@ public static partial class TinyTui
         RenderBottomBorder(output, x, y + height - 1, innerWidth, borderColor, brightBorder);
     }
 
+    /// <summary>
+    /// Draws a simple box around the given contents.
+    /// </summary>
+    /// <param name="contents"></param>
+    /// <param name="lineColor"></param>
+    /// <param name="textColor"></param>
     public static void ShowBox(
         string[] contents,
         ConsoleColor lineColor = ConsoleColor.DarkYellow,
@@ -121,7 +127,11 @@ public static partial class TinyTui
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    private static List<string> PrepareContentLines(IEnumerable<string>? content, int innerWidth, int innerHeight)
+    private static List<string> PrepareContentLines(
+		IEnumerable<string>? content,
+		int innerWidth,
+		int innerHeight
+)
     {
         var lines = new List<string>();
         if (content is null || innerHeight <= 0)
