@@ -4,33 +4,48 @@ public static class Program
 {
     public static void Main()
     {
+        int menuSelection = 1;
+
         TinyTui.Startup();
-        TinyTui.ClearScreen();
 
-        var windowSize = TinyTui.GetWindowSize();
+        while (menuSelection != 0)
+        {
+            TinyTui.ClearScreen();
 
-        SimpleBox();
-		AdvancedBox();
-		Spinner();
+            var windowSize = TinyTui.GetWindowSize();
 
-
-        TinyTui.Goto(15, 1);
-
-        var result = TinyTui.ShowMenu2(
-            "You are using the TinyTui Menu.  Choose an option below:",
-            new List<TinyTui.MenuItem>
+            switch (menuSelection)
             {
-                new TinyTui.MenuItem("Show a Simple Box", 1),
-                new TinyTui.MenuItem("Show an Advanced Box", 2),
-                new TinyTui.MenuItem("Show a Spinner", 3),
-                new TinyTui.MenuItem("Exit the program", 0)
-            },
-            multiSelect: false,
-            promptColor: ConsoleColor.DarkYellow,
-            highlightColor: ConsoleColor.Cyan,
-            selectionColor: ConsoleColor.Yellow
-        );
-        Console.WriteLine($"You selected: '{result.PrimaryItem?.Name}' with value: '{result.PrimaryItem?.Value}'");
+                case 1:
+                    SimpleBox();
+                    break;
+                case 2:
+                    AdvancedBox();
+                    break;
+                case 3:
+                    Spinner();
+                    break;
+            }
+
+            TinyTui.Goto(15, 1);
+
+            var result = TinyTui.ShowMenu2(
+                "You are using the TinyTui Menu.  Choose an option below:",
+                new List<TinyTui.MenuItem>
+                {
+                    new TinyTui.MenuItem("Show a Simple Box", 1),
+                    new TinyTui.MenuItem("Show an Advanced Box", 2),
+                    new TinyTui.MenuItem("Show a Spinner", 3),
+                    new TinyTui.MenuItem("Exit the program", 0)
+                },
+                multiSelect: false,
+                promptColor: ConsoleColor.DarkYellow,
+                highlightColor: ConsoleColor.Cyan,
+                selectionColor: ConsoleColor.Yellow
+            );
+            menuSelection = (int)(result.PrimaryItem?.Value ?? 0);
+        }
+        //Console.WriteLine($"You selected: '{result.PrimaryItem?.Name}' with value: '{result.PrimaryItem?.Value}'");
         TinyTui.Cleanup();
     }
 
@@ -59,15 +74,15 @@ public static class Program
         );
     }
 
-	private static void Spinner()
-	{
-		TinyTui.Spinner(
-			() =>
-			{
-				// Simulate some work
-				System.Threading.Thread.Sleep(3000);
-			},
-			"Processing with spinner..."
-		);
-	}
+    private static void Spinner()
+    {
+        TinyTui.Spinner(
+            () =>
+            {
+                // Simulate some work
+                System.Threading.Thread.Sleep(3000);
+            },
+            "Processing with spinner..."
+        );
+    }
 }
